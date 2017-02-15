@@ -1,0 +1,68 @@
+<%= form_for(@team) do |f| %>
+  <% if @team.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@team.errors.count, "error") %> prohibited this team from being saved:</h2>
+
+      <ul>
+      <% @team.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= f.label :name %><br>
+    <%= f.text_field :name, :class => 'form-control' %>
+  </div>
+
+  <h4>Phone number ranges</h4>
+  <p>Calls made to or from phone numbers within these ranges will be visible to members of this team.</p>
+  <div class="form-group">
+    <table id="numberRanges">
+      <tr>
+        <th>
+          <label>Start</label>
+        </th><th>
+        </th><th>
+          <label>End</label>
+        </th>
+      </tr>
+      <% for number_range in @team.number_ranges %>
+        <input type="hidden" name="number_ranges[][id]" value="<%= number_range.id %>">
+        <tr>
+          <td>
+            <input type="tel" name="number_ranges[][start]" value="<%= number_range.start %>" class="form-control">
+          </td><td>
+            &nbsp;-&nbsp;
+          </td><td>
+            <input type="tel" name="number_ranges[][end]" value="<%= number_range.end %>" class="form-control">
+          </td>
+        </tr>
+      <% end %>
+      <tr>
+        <td>
+          <input type="tel" name="number_ranges[][start]" class="form-control">
+        </td><td>
+          &nbsp;-&nbsp;
+        </td><td>
+          <input type="tel" name="number_ranges[][end]" class="form-control">
+        </td>
+      </tr>
+    </table>
+    <div class="col-sm-offset-2">
+      <button type="button" onclick="appendNumberRange();" class="btn btn-info">+ Add row</button>
+    </div>
+  </div>
+
+  <div class="actions">
+    <%= f.submit :class => "btn btn-primary" %>
+  </div>
+<% end %>
+<% content_for :javascript do %>
+	<script>
+    function appendNumberRange() {
+      $("#numberRanges").append("<tr><td><input type=\"tel\" name=\"number_ranges[][start]\" class=\"form-control\"></td><td>&nbsp;-&nbsp;</td><td><input type=\"tel\" name=\"number_ranges[][end]\" class=\"form-control\"></td></tr>");
+    }
+  </script>
+<% end %>

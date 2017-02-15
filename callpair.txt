@@ -1,0 +1,14 @@
+=IF(
+	OFFSET([@[Call Pair]],-1,0)="Call Pair", 
+		1,
+		IF(
+			AND(
+				[@[Call Date]]-OFFSET([@[Call Date]],-1,0)<=TIMEVALUE("0:00:20"),
+				RIGHT([@Caller],9)=RIGHT(OFFSET([@Caller],-1,1),9)
+			),
+			OFFSET([@[Call Pair]],-1,0),
+			OFFSET([@[Call Pair]],-1,0)+1
+		)
+)
+
+If two calldates are within 20 seconds

@@ -1,0 +1,47 @@
+development:
+  adapter: mysql2
+  username: corvus
+  password: corvus
+  database: corvus_development
+  pool: 5
+  timeout: 5000
+
+test:
+  adapter: mysql2
+  username: corvus
+  password: corvus
+  database: corvus_test
+  pool: 5
+  timeout: 5000
+
+production:
+  adapter: mysql2
+  username: corvus
+  password: corvus
+  database: corvus
+  pool: 5
+  timeout: 5000
+
+voipmonitor_development:
+  adapter: mysql2
+  username: corvus
+  password: corvus
+  database: voipmonitor_development
+  pool: 5
+  timeout: 5000
+
+voipmonitor_test:
+  adapter: mysql2
+  username: corvus
+  password: corvus
+  database: voipmonitor_test
+  pool: 5
+  timeout: 5000
+
+voipmonitor_production:
+  adapter: mysql2
+  database: voipmonitor
+  username: corvus
+  password: corvus
+  pool: 5
+  timeout: 5000

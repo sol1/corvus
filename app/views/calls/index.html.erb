@@ -1,0 +1,316 @@
+<h1>Calls</h1>
+
+<form method="get" class="form-inline">
+	<div class="form-group" style="margin-right: 20px">
+		<label for="date_from">From:</label>
+		<input type="text" name="date_from" class="form-control datepicker text-center" value="<%= @date_from.strftime('%d/%m/%Y') rescue '' %>" placeholder="Pick a date">
+	</div>
+	<div class="form-group" style="margin-right: 20px">
+		<label for="date_to">To:</label>
+		<input type="text" name="date_to" class="form-control datepicker text-center" value="<%= @date_to.strftime('%d/%m/%Y') rescue '' %>" placeholder="Pick a date">
+	</div>
+	<div class="form-group" style="margin-right: 20px">
+		<label for="s">Phone:</label>
+		<select name="s" class="form-control" style="width: 9em">
+			<option value="called" <%= 'selected="selected"' if @phone_field == "called" %>>Called</option>
+			<option value="caller" <%= 'selected="selected"' if @phone_field == "caller" %>>Caller</option>
+			<option value="any" <%= 'selected="selected"' if @phone_field == "any" %>>Any</option>
+		</select>
+		<input type="text" name="p" class="form-control text-left" style="width: 11em" value="<%= @phone_number %>" placeholder="Number contains">
+	</div>
+	<button type="submit" class="btn btn-default">Search</button>
+</form>
+
+<%= will_paginate @calls, :renderer => BootstrapPagination::Rails %>
+
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>ID</th>
+			<th>From</th>
+			<th>To</th>
+			<th>Date</th>
+			<th>Time</th>
+			<th>Duration</th>
+			<th class="text-center">Listen</th>
+			<th>Rating</th>
+			<th class="text-center">Comments</th>
+		</tr>
+	</thead>
+	<tbody>
+		<% @calls.each do |call| %>
+			<tr>
+				<td><%= link_to call.id, call, :class => 'listen-link', :data => {:call_id => call.id} %></td>
+				<td>
+					<% if !call.callername.blank? %>
+						<abbr data-toggle="tooltip" data-placement="bottom" title="<%= call.callername %>"><%= call.caller %></abbr>
+					<% else %>
+						<%= call.caller %>
+					<% end -%>
+				</td>
+				<td><%= call.called.number %></td>
+				<td><%= call.calldate.strftime('%a %e %b %Y') %></td>
+				<td><%= call.calldate.strftime('%H:%M') %></td>
+				<td><%= hms(call.connect_duration) %></td>
+				<td class="text-center">
+					<%= link_to '<i class="glyphicon glyphicon-play-circle"></i>'.html_safe, call,
+						:class => 'listen-link', :data => {:call_id => call.id} %>
+				</td>
+				<td style="white-space: nowrap" id="list-rating-<%=call.id%>">
+					<% if call.rating %>
+						<% call.rating.rating.times do %>
+							<i class="glyphicon glyphicon-star"></i>
+						<% end -%>
+						<% (5 - call.rating.rating).times do %>
+							<i class="glyphicon glyphicon-star-empty"></i>
+						<% end -%>
+					<% end -%>
+				</td>
+				<td class="text-center" id="list-comment-<%=call.id%>">
+					<% unless call.comment_text.blank? %>
+						<i class="glyphicon glyphicon-comment" data-toggle="tooltip" data-placement="bottom" title="<%= call.comment_text %>"></i>
+						<%= call.comments.size %>
+					<% end -%>
+				</td>
+			</tr>
+		<% end %>
+	</tbody>
+</table>
+
+<%= will_paginate @calls, :renderer => BootstrapPagination::Rails %>
+
+<!-- Modal -->
+<div class="modal fade" id="callModal" tabindex="-1" role="dialog" aria-labelledby="callModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="callModalLabel">Call #<span id="listen-call-id"></span></h4>
+      </div>
+
+      <div class="modal-body">
+		<dl class="dl-horizontal">
+			<dt>Date</dt>
+			<dd id="listen-call-datetime"></dd>
+			<dt>Duration</dt>
+			<dd id="listen-call-duration"></dd>
+			<dt>From</dt>
+			<dd id="listen-call-caller"></dd>
+			<dt></dt>
+			<dd id="listen-call-callername"></dd>
+			<dt>To</dt>
+			<dd id="listen-call-called"></dd>
+		</dl>
+
+		<div id="listen-player-throbber"> Loading audio ..</div>
+		<div id="listen-player-div"></div>
+		<a href="#" id="listen-download" style="margin-left: 75px"><i class="glyphicon glyphicon-download-alt"></i> Download audio</a>
+
+		<h4 style="margin-top: 20px">Rating</h4>
+		<div id="listen-rating"></div>
+		<div id="listen-rater"></div>
+
+		<div class="row">
+			<h4 style="margin-top: 20px; margin-left: 15px">Comments</h4>
+			<dl class="dl-horizontal" id="listen-comments"></dl>
+
+			<form method="post" id="comment-form" class="xform-inline">
+				<div class="form-group col-md-12" style="margin-right: 20px; width: 100%">
+					<textarea class="form-control" style="width: 100%" rows="3" id="comment-content" name="comment[content]"></textarea>
+				</div>
+				<input type="hidden" name="comment[call_id]" id="comment-call-id">
+				<button type="submit" id="comment-submit" class="btn btn-default pull-right" style="margin-right: 15px">Save comment</button>
+			</form>
+		</div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<% content_for :javascript do %>
+	<script>
+	$(function () {
+		// Init datepickers
+		$('.datepicker').pickadate({ format: 'dd/mm/yyyy' });
+
+		// Init tooltips
+		$('[data-toggle="tooltip"]').tooltip();
+
+		var player;
+
+		function render_comments(call_id) {
+			$('#listen-comments').html('');
+			$.get('/calls/'+call_id+'/comments.json', function(comments) {
+				if (comments && comments.length > 0) {
+					for (var i = comments.length - 1; i >= 0; i--) {
+						$('#listen-comments').append(
+							'<dt style="width: 50%; margin-right: 10px;">'+
+								'<a href="javascript:void(0)" class="delete-comment" data-comment-id="'+comments[i].id+'">'+
+									'<i class="glyphicon glyphicon-trash"></i>'+
+								'</a>'+
+								comments[i].author+' at '+comments[i].created_at_s+
+							'</dt>'+
+							'<dd style="width: 50%">'+comments[i].content+'</dd>'
+						)
+					};
+					// Update the display of the number of comments in the list view behind
+					$('#list-comment-'+call_id).html('<i class="glyphicon glyphicon-comment"></i> ' + comments.length);
+
+					$('.delete-comment').off('click').on('click', function(e) {
+						e.preventDefault();
+						$.ajax({
+							url: '/comments/'+$(this).data('comment-id')+'.json',
+							type: 'DELETE',
+							success: function(result) {
+								render_comments(call_id);
+							}
+						});
+					});
+				} else {
+					$('#listen-comments').html('<dt></dt><dd style="margin-left: 15px">No comments yet.</dd>');
+				}
+			});
+		}
+
+		function render_call_detail(call_id) {
+			var call;
+
+			$.get('/calls/'+call_id+'.json', function(call) {
+				$('#listen-call-datetime').text(call.datetime);
+				$('#listen-call-duration').text(call.duration);
+				$('#listen-call-caller').text(call.caller);
+				$('#listen-call-callername').text(call.callername);
+				$('#listen-call-called').text(call.called.number);
+				$('#listen-download').attr('href', call.download_path);
+
+				// Other
+				$('#listen-player-div').html(
+					'<audio id="listen-player" controls preload="auto" autoplay>' +
+					'  <source src="'+ call.wav_path +'" type="audio/wav">' +
+					'  Your web browser does not support this audio player.' +
+					'  Please try using Chrome or Firefox.' +
+					'</audio>'
+				);
+				$('#listen-player').children('source').first().on('error', function() {
+					//TODO: find a way to extract the json returned in place of audio
+					console.debug('Error loading audio source..');
+					$.get(call.wav_path, function(err) {
+						e = $.parseJSON(err);
+						console.debug(err);
+						$('#listen-player-div').html(
+							'<h4>VoipMonitor has returned the following error:</h4>' +
+							'<p style="margin-left:2em;">"<span style="color: #f00;">' + e.msg + '</span>"</p>'
+						);
+						$('#listen-player-throbber').toggle(false);
+						$('#listen-player-div').toggle(true);
+					});
+				});
+				// When the player is ready to play, hide the loading animation and autoplay
+				$('#listen-player').off('canplay').on('canplay', function() {
+					// Show the hidden elements
+					$('#listen-player-throbber').toggle(false);
+					$('#listen-player-div').toggle(true);
+					$('#listen-download').toggle(true);
+
+					// Autoplay the audio
+					// But also double check the modal is still open in case it was closed immediately
+					if ($('#callModal').css('display') == "block") {
+						player = document.getElementById('listen-player');
+						player.play();
+					}
+				}).on('error', function() {
+					alert("There was an error with the playback.");
+				});
+
+				$('#comment-call-id').val(call_id);
+
+				render_rating(call_id, call.rating);
+				render_rater(call_id, call.rater);
+			});
+
+			// Hide some elements until they are ready
+			$('#listen-player-throbber').toggle(true);
+			$('#listen-player-div').toggle(false);
+			$('#listen-download').toggle(false);
+
+			// Labels
+			$('#listen-call-id').text(call_id);
+
+			render_comments(call_id);
+			$('#comment-content').val('').focus();
+
+			$('#comment-form').off('submit').on('submit', function() {
+				$('#comment-submit').text('Saving ..').attr('disabled', 'disabled');
+				$.post('/comments.json', $('#comment-form').serialize(), function(data) {
+					render_comments(call_id);
+				}).always(function() {
+					$('#comment-submit').removeAttr('disabled').text('Save comment');
+				}).fail(function() {
+					alert('There was an error posting your comment.');
+				});
+				$('#comment-content').val('');
+				return false;
+			});
+
+			$('#callModal').modal().on('hidden.bs.modal', function (e) {
+				// When the modal closes, make sure we stop the audio if it's still going
+				player = document.getElementById('listen-player');
+				if (player) {
+					player.pause();
+				}
+			});
+		}
+
+		function render_rater(call_id, rater) {
+			if (typeof(rater) == 'undefined') rater = '';
+			// if (rater != '') $('#listen-rating').append(' by ' + rater);
+			$('#listen-rater').html('');
+			if (rater != '') $('#listen-rater').append('by ' + rater);
+		}
+
+		function render_rating(call_id, rating) {
+			$('#listen-rating').html('');
+			for (var i = 0; i < rating; i++) {
+				$('#listen-rating').append(
+					'<a href="javascript:void(0)" data-call-id="'+call_id+'" data-rating="'+(i+1)+'" class="rate">'+
+					'<i class="glyphicon glyphicon-star" style="margin-right: 4px"></i>'+
+					'</a>'
+				);
+			};
+			for (var i = rating; i < 5; i++) {
+				$('#listen-rating').append(
+					'<a href="javascript:void(0)" data-call-id="'+call_id+'" data-rating="'+(i+1)+'" class="rate">'+
+					'<i class="glyphicon glyphicon-star-empty" style="margin-right: 4px"></i>'+
+					'</a>'
+				);
+			};
+
+			$('.rate').off('click').on('click', function(event) {
+				event.preventDefault();
+				var rating = $(this).data('rating');
+
+				$.post('/ratings.json', {rating: {call_id: call_id, rating: rating}}, function(data) {
+					render_rating(call_id, rating);
+					render_rater(call_id, data.rater);
+					// Backpatch the new rating to the list view behind
+					$('#list-rating-' + call_id).html($('#listen-rating').html());
+				}).fail(function() {
+					alert('There was an error posting your rating.');
+				});
+			});
+		}
+
+		$('.listen-link').click(function(event) {
+			event.preventDefault();
+
+			var call_id = $(this).data('call-id');
+			var call = render_call_detail(call_id);
+		});
+	})
+	</script>
+<% end -%>

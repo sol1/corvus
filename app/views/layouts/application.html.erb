@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+		<meta name="description" content="">
+		<meta name="author" content="">
+		<link rel="icon" href="/favicon.ico">
+
+		<title><%= @title ? (@title + " - ") : '' %>Corvus</title>
+		<%= stylesheet_link_tag    'application', media: 'all' %>
+		<%= csrf_meta_tags %>
+
+		<!-- Bootstrap core CSS -->
+		<link href="/css/bootstrap.min.css" rel="stylesheet">
+		<link href="/pickadate/themes/default.css" rel="stylesheet">
+		<link href="/pickadate/themes/default.date.css" rel="stylesheet">
+
+		<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+		<!--[if lt IE 9]>
+			<script src="/html5shiv.min.js"></script>
+			<script src="/respond.min.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+		<!-- Fixed navbar -->
+		<nav class="navbar navbar-default navbar-fixed-top">
+			<div class="container">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<a class="navbar-brand" href="/">Corvus Call Recording</a>
+				</div>
+				<div id="navbar" class="navbar-collapse collapse">
+					<ul class="nav navbar-nav">
+						<% if current_user %>
+							<li class="<%= active_if_controller('calls') %>"><%= link_to "Calls", calls_path %></li>
+							<li class="<%= active_if_controller('campaigns') %>"><%= link_to "Campaigns", campaigns_path %></li>
+							<li class="dropdown <%= active_if_controller('reports') %>">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Reports <span class="caret"></span></a>
+								<ul class="dropdown-menu" role="menu">
+									<li><a href="/reports/rating_breakdown">Rating Breakdown</a></li>
+									<li><a href="/reports/campaign_breakdown">Campaign Breakdown</a></li>
+								</ul>
+							</li>
+						<% end -%>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+						<% if current_user %>
+							<li id="menu6" class="dropdown <%= active_if_controller('users') %>">
+								<%= link_to '<i class="glyphicon glyphicon-user"></i>'.html_safe, user_path(current_user),
+									:class => "dropdown-toggle", "data-toggle" => "dropdown" %>
+								<ul class="dropdown-menu">
+									<li><%= link_to "My Profile", user_path(current_user) %></li>
+									<% if current_user.manager? %>
+										<li><%= link_to "System Users", users_path %></li>
+										<li><%= link_to "Teams", teams_path %></li>
+										<li><%= link_to "Campaigns", campaigns_path %></li>
+									<% end -%>
+								</ul>
+							</li>
+							<li><%= link_to '<i class="glyphicon glyphicon-log-out"></i>'.html_safe, destroy_user_session_path, :method => :delete %></li>
+						<% else %>
+							<li><%= link_to "Log In", new_user_session_path %></li>
+						<% end -%>
+					</ul>
+				</div><!--/.nav-collapse -->
+			</div>
+		</nav>
+
+		<div class="container">
+			<%= bootstrap_flash %>
+			<%= yield %>
+		</div> <!-- /container -->
+
+		<%= javascript_include_tag "application" %>
+		<script src="/js/bootstrap.min.js"></script>
+		<script src="/pickadate/picker.js"></script>
+		<script src="/pickadate/picker.date.js"></script>
+		<script src="/pickadate/legacy.js"></script>
+		<%= yield :javascript %>
+
+		<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+		<!-- <script src="/assets/js/ie10-viewport-bug-workaround.js"></script> -->
+	</body>
+</html>

@@ -1,0 +1,30 @@
+<p>
+  <strong>Name:</strong>
+  <%= @team.name %>
+</p>
+
+<p>
+  <table>
+    <tr>
+      <td style="vertical-align:top; padding-right:1em;">
+        <strong>Number Ranges:</strong>
+      </td>
+      <td>
+        <table>
+        <% for nr in @team.number_ranges %>
+          <tr>
+            <td>
+              <%= nr.start %>
+            </td><td style="padding-left:1em; padding-right:1em;"> - </td><td>
+              <%= nr.end %>
+            </td>
+          </tr>
+        <% end %>
+        </table>
+      </td>
+    </tr>
+  </table>
+</p>
+
+<%= link_to 'Edit', edit_team_path(@team) %> |
+<%= link_to 'Back', teams_path %>

@@ -1,0 +1,31 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  cdr_id: 1
+  calldate: 2015-06-01 15:48:35
+  callend: 2015-06-01 15:48:35
+  duration: 1
+  connect_duration: 1
+  caller: MyString
+  callername: MyString
+  called_id: 
+  whohanged: MyString
+  bye: 1
+  last_sip_respone_id: 1
+  last_sip_response_num: 1
+  id_sensor: 1
+
+two:
+  cdr_id: 1
+  calldate: 2015-06-01 15:48:35
+  callend: 2015-06-01 15:48:35
+  duration: 1
+  connect_duration: 1
+  caller: MyString
+  callername: MyString
+  called_id: 
+  whohanged: MyString
+  bye: 1
+  last_sip_respone_id: 1
+  last_sip_response_num: 1
+  id_sensor: 1

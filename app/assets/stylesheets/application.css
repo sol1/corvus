@@ -1,0 +1,41 @@
+/*
+ * This is a manifest file that'll be compiled into application.css, which will include all the files
+ * listed below.
+ *
+ * Any CSS and SCSS file within this directory, lib/assets/stylesheets, vendor/assets/stylesheets,
+ * or any plugin's vendor/assets/stylesheets directory can be referenced here using a relative path.
+ *
+ * You're free to add application-wide styles to this file and they'll appear at the bottom of the
+ * compiled file so the styles you add here take precedence over styles defined in any styles
+ * defined in the other CSS/SCSS files in this directory. It is generally better to create a new
+ * file per style scope.
+ *
+ *= require_tree .
+ *= require_self
+ */
+
+body {
+	padding-top: 80px;
+}
+#listen-player-throbber {
+	width: 160px;
+	height: 40px;
+	background-image: url('/images/telephone.gif');
+	background-repeat: no-repeat;
+	padding-left: 45px;
+	padding-top: 10px;
+	overflow: hidden;
+}
+.delete-comment {
+	margin-left: 10px;
+	margin-right: 10px;
+	color: red;
+}
+#listen-rating {
+	width: 100px;
+	clear: left;
+	float: left;
+}
+#lister-rater {
+	float: left;
+}

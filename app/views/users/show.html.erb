@@ -1,0 +1,27 @@
+<p>
+  <strong>Email:</strong>
+  <%= @user.email %>
+</p>
+
+<p>
+  <strong>First name:</strong>
+  <%= @user.first_name %>
+</p>
+
+<p>
+  <strong>Last name:</strong>
+  <%= @user.last_name %>
+</p>
+
+<p>
+  <strong>Team:</strong>
+  <%= @user.team.name unless !@user.team %>
+</p>
+
+<p>
+  <strong>Manager:</strong>
+  <%= @user.manager %>
+</p>
+
+<%= link_to 'Edit', edit_user_path(@user) %> |
+<%= link_to 'Back', users_path %>
