@@ -2,6 +2,18 @@
 
 A prototype Rails application that ingests phone call records from a [VoIPmonitor](http://www.voipmonitor.org/) instance and provides aggregate high-level reporting on phone call activity, as well as audio playback.
 
+## Teams
+
+Teams within your organisation can be set up based on their phone extensions or number ranges. Corvus system users can then be assigned to those teams to have their view of individual phone records filtered to that set.
+
+## Campaigns
+
+Assign dedicated phone numbers to marketing campaigns to report on conversions.
+
+## Call Ratings
+
+Use a simple star-rating system for QA.
+
 ## Development
 
 * Have a working installation of `rvm` ([https://rvm.io/](https://rvm.io/))
