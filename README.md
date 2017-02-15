@@ -63,3 +63,7 @@ We need a username, password and the following rights granted:
 * `scp config/*.yml <host>:corvus/shared/config/`
 * `cap production deploy:check --trace`
 * `cap production deploy`
+
+## Call record ingest
+
+Set up a regular cronjob for `lib/voipmonitor_api_importer.sh`.
